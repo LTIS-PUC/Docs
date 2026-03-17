@@ -43,10 +43,12 @@ A ferramenta de controle de versão adotada no projeto foi o
 
 A equipe utiliza metodologias ágeis, tendo escolhido o Scrum como base para o processo de desenvolvimento. A organização da equipe é a seguinte:
 
+### Supervisores
+
 | Nome  | Campus|
 |------  |------|
 | Prof. Fabiano Costa Teixeira  | PUC Poços de Caldas |
-| Prof. Kleber Jacques Ferreira | PUC Contagem |
+| Prof. Kleber Jacques Ferreira de Souza | PUC Contagem |
 | Prof. Clóvis Lemos Tavares | PUC Betim |
 
 ### Scrum Master
