@@ -23,12 +23,13 @@ Essa abordagem garante maior organização, agilidade e adaptabilidade ao longo 
 |Banco de Dados| PostgreSQL | [Banco de Dados]() | Banco de dados em tempo real e autenticação para aplicativos móveis. |
 
 
-## Frameworks e Tecnologias para Desenvolvimento Mobile
+## Frameworks e Tecnologias para Desenvolvimento
 
 | TECNOLOGIA/FERRAMENTA | DESCRIÇÃO
 |------------|---------------|
-| React Native | Framework mantido pelo Facebook, baseado em React e JavaScript. |
-| Expo | Ferramenta que facilita o desenvolvimento e teste de aplicativos React Native. |
+| React + Next | Biblioteca e framework JavaScript para construção de interfaces web modernas, reativas e com suporte a renderização server-side. |
+| C# / .NET | Linguagem e plataforma da Microsoft utilizada para desenvolvimento do backend da aplicação. |
+| PostgreSQL | Sistema gerenciador de banco de dados relacional, utilizado para persistência dos dados do sistema. |
 
 ## Controle de Versão
 
@@ -97,6 +98,7 @@ A escolha do editor de código foi motivada pelo impacto direto no controle de v
 | Editor de Código | VS Code | Escolhido por ser um editor leve, altamente personalizável e com suporte a extensões que aumentam a produtividade, como integração com Git, depuração e linting. |
 | Comunicação| Microsoft Teams | Facilidade de uso e colaboração em tempo real. |
 | Controle de Versão | Git e Github | Padrão da indústria e facilidade de colaboração. |
-| Wireframing | Figma | Colaboração em tempo real e recursos avançados de prototipagem. |
-| Diagrama | Lucid app | Escolhido por ser uma ferramenta de diagramação colaborativa em tempo real, com uma interface intuitiva e suporte a diversos tipos de diagramas (fluxogramas, wireframes, UML, etc.). |
-| Hospedagem |  |  |
+| Wireframing | PostgreSQL | Colaboração em tempo real e recursos avançados de prototipagem. |
+| Banco de Dados | Figma | Banco de dados relacional robusto, amplamente utilizado em aplicações institucionais. |
+| Diagrama | Mermaid | Utilizado para criação de diagramas diretamente em arquivos Markdown, permitindo versionamento junto com o código e integração em documentações técnicas. |
+| Hospedagem | VM Institucional | Hospedagem realizada em máquina virtual gerenciada internamente pela instituição. |
