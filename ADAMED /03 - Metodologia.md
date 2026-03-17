@@ -79,7 +79,7 @@ A fim de obter um processo mais organizado, optamos por utilizar o GitHub Projec
 
 O quadro Kanban desenvolvido pelo grupo pode ser acessado clicando [aqui](https://github.com/orgs/LTIS-PUC/projects/1). Abaixo, é possível ver uma representação dele. 
 
-![Quadro Kanban](/img/KanbanADAMED.png)
+![Quadro Kanban](img/KanbanADAMED.png)
  
 ### Ferramentas
 
