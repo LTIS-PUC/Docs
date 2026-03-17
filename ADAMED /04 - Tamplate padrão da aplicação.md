@@ -4,9 +4,17 @@ Pré-requisitos: [Documentação de contexto](https://github.com/LTIS-PUC/Docs/b
 
 Layout padrão da aplicação que será utilizado em todas as páginas com a definição de identidade visual, aspectos de responsividade e iconografia.
 
-![ADAMED](../img/adamedinit.png)
+![ADAMED](img/adamedinit.png)
 
-## Diagrama de Classes
+### Login e Cadastro
+
+![aaaaaaaaaa](img/diagrama-de-classe.svg)
+
+### Home
+
+![aaaaaaaaaa](img/diagrama-de-classe.svg)
+
+### Cadastro de provas
 
 ![aaaaaaaaaa](img/diagrama-de-classe.svg)
 
