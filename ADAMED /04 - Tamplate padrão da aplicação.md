@@ -1,10 +1,8 @@
-# Arquitetura da Solução
+# Template Padrão da Aplicação
 
 Pré-requisitos: [Documentação de contexto](https://github.com/LTIS-PUC/Docs/blob/main/ADAMED%20/01%20-%20Documenta%C3%A7%C3%A3o%20de%20contexto.md), [Requisitos do projeto](https://github.com/LTIS-PUC/Docs/blob/main/ADAMED%20/02%20-%20Requisitos%20do%20projeto.md),  [Metodologia](https://github.com/LTIS-PUC/Docs/blob/main/ADAMED%20/03%20-%20Metodologia.md)
 
 Layout padrão da aplicação que será utilizado em todas as páginas com a definição de identidade visual, aspectos de responsividade e iconografia.
-
-![ADAMED](img/adamedinit.png)
 
 ## Login 
 
@@ -12,11 +10,47 @@ Layout padrão da aplicação que será utilizado em todas as páginas com a def
 
 ![Login2](img/telalogin2.png)
 
-### Home
+&nbsp;
 
-![aaaaaaaaaa](img/diagrama-de-classe.svg)
+# Telas de cadastro de provas e questões
 
-### Cadastro de provas
+### Cadastro de Prova
 
-![aaaaaaaaaa](img/diagrama-de-classe.svg)
+![cadastro de Prova](img/telacadastroprova.png)
+
+### Cadastro de Questão
+
+![cadastro de questão](img/telacadastrodequestao.png)
+
+&nbsp;
+
+# Telas Professor
+
+### Banco de questões 
+
+![aaaaaaaaaa](img/bancodequestoesprof.png)
+
+### Banco de Unidades
+
+![aaaaaaaaaa](img/bancodeunidadesprof.png)
+
+### Banco de Provas
+
+![aaaaaaaaaa](img/bancodeprovasprof.png)
+
+### Banco de Aplicação
+
+![aaaaaaaaaa](img/bancodeaplicacaoprof.png)
+
+&nbsp;
+
+# Telas Revisor
+
+### Banco de Questões Revisor
+
+![aaaaaaaaaa](img/bancodequestoesrevisor.png)
+
+### Gestão de Provas Revisor
+
+![aaaaaaaaaa](img/gestaodeprovasrevisor.png)
 
