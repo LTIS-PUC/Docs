@@ -1,0 +1,1483 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutorial Mini-CEX na plataforma Sinapse</title>
+  <meta name="description"
+    content="Tutorial interativo passo a passo do Mini-CEX, Mini-CEX adaptado e períodos avaliativos, com telas reais geradas por testes E2E e a base teórica do Caderno Mini-CEX APS.">
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #fff;
+      --ink: #1b2430;
+      --muted: #5b6778;
+      --line: #dde3ec;
+      --brand: #0a4fa3;
+      --brand-2: #e8f0fc;
+      --ok: #0f7b4b;
+      --ok-bg: #e6f6ee;
+      --warn: #8a5a00;
+      --warn-bg: #fff4d9;
+      --bad: #a52a2a;
+      --bad-bg: #fdeaea;
+      --theory: #5a2d91;
+      --theory-bg: #f1eafb;
+      --code: #eef1f6;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(20, 30, 50, .08), 0 6px 18px rgba(20, 30, 50, .06);
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #10151d;
+        --card: #18202b;
+        --ink: #e7ecf3;
+        --muted: #9aa7b8;
+        --line: #2a3646;
+        --brand: #6aa7ff;
+        --brand-2: #1a2b44;
+        --ok: #52d19b;
+        --ok-bg: #12302a;
+        --warn: #f0c15a;
+        --warn-bg: #35290d;
+        --bad: #ff8c8c;
+        --bad-bg: #3a1a1a;
+        --theory: #c4a1ff;
+        --theory-bg: #2a2140;
+        --code: #222c3a;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #10151d;
+      --card: #18202b;
+      --ink: #e7ecf3;
+      --muted: #9aa7b8;
+      --line: #2a3646;
+      --brand: #6aa7ff;
+      --brand-2: #1a2b44;
+      --ok: #52d19b;
+      --ok-bg: #12302a;
+      --warn: #f0c15a;
+      --warn-bg: #35290d;
+      --bad: #ff8c8c;
+      --bad-bg: #3a1a1a;
+      --theory: #c4a1ff;
+      --theory-bg: #2a2140;
+      --code: #222c3a;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+    }
+
+    a {
+      color: var(--brand)
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      min-height: 100vh
+    }
+
+    nav.side {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow: auto;
+      background: var(--card);
+      border-right: 1px solid var(--line);
+      padding: 18px 14px
+    }
+
+    nav.side h1 {
+      font-size: 1.05rem;
+      margin: 0 0 4px
+    }
+
+    nav.side small {
+      color: var(--muted)
+    }
+
+    nav.side ol {
+      list-style: none;
+      margin: 14px 0 0;
+      padding: 0
+    }
+
+    nav.side li a {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: .92rem
+    }
+
+    nav.side li a:hover {
+      background: var(--brand-2)
+    }
+
+    nav.side li a.active {
+      background: var(--brand);
+      color: #fff
+    }
+
+    nav.side li a .n {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--brand-2);
+      color: var(--brand);
+      font-size: .75rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center
+    }
+
+    nav.side li a.active .n {
+      background: #fff;
+      color: var(--brand)
+    }
+
+    nav.side li a.done .n::after {
+      content: "✓"
+    }
+
+    nav.side li a.done .n {
+      background: var(--ok-bg);
+      color: var(--ok)
+    }
+
+    nav.side li a.done .n span {
+      display: none
+    }
+
+    .progress {
+      height: 6px;
+      background: var(--line);
+      border-radius: 6px;
+      margin: 12px 0 0;
+      overflow: hidden
+    }
+
+    .progress b {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--brand);
+      transition: width .3s
+    }
+
+    .tools {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap
+    }
+
+    button,
+    .btn {
+      font: inherit;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    button:hover {
+      border-color: var(--brand)
+    }
+
+    button.primary {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand)
+    }
+
+    main {
+      padding: 28px clamp(16px, 4vw, 48px) 80px;
+      max-width: 1100px
+    }
+
+    section.step {
+      display: none
+    }
+
+    section.step.on {
+      display: block;
+      animation: fade .25s
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      margin: .2em 0 .4em
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin: 1.6em 0 .4em
+    }
+
+    h4 {
+      margin: 1.2em 0 .3em
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--muted)
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin: 16px 0
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))
+    }
+
+    .callout {
+      border-left: 4px solid var(--brand);
+      background: var(--brand-2);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 16px 0
+    }
+
+    .callout.theory {
+      border-color: var(--theory);
+      background: var(--theory-bg)
+    }
+
+    .callout.warn {
+      border-color: var(--warn);
+      background: var(--warn-bg)
+    }
+
+    .callout.ok {
+      border-color: var(--ok);
+      background: var(--ok-bg)
+    }
+
+    .callout.bad {
+      border-color: var(--bad);
+      background: var(--bad-bg)
+    }
+
+    .callout b.t {
+      display: block;
+      margin-bottom: 2px
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 1px 9px;
+      border-radius: 99px;
+      font-size: .78rem;
+      font-weight: 600;
+      background: var(--brand-2);
+      color: var(--brand);
+      margin-right: 4px
+    }
+
+    .tag.th {
+      background: var(--theory-bg);
+      color: var(--theory)
+    }
+
+    .tag.ok {
+      background: var(--ok-bg);
+      color: var(--ok)
+    }
+
+    figure {
+      margin: 16px 0
+    }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: zoom-in;
+      display: block;
+      background: #fff
+    }
+
+    figure.tall img {
+      max-height: 620px;
+      object-fit: cover;
+      object-position: top
+    }
+
+    figcaption {
+      font-size: .88rem;
+      color: var(--muted);
+      margin-top: 6px
+    }
+
+    figcaption b {
+      color: var(--ink)
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: .93rem;
+      margin: 10px 0
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      background: var(--brand-2)
+    }
+
+    .tablewrap {
+      overflow-x: auto
+    }
+
+    ol.how {
+      counter-reset: s;
+      list-style: none;
+      padding: 0;
+      margin: 12px 0
+    }
+
+    ol.how li {
+      counter-increment: s;
+      position: relative;
+      padding: 6px 0 6px 40px
+    }
+
+    ol.how li::before {
+      content: counter(s);
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: .85rem
+    }
+
+    .fill {
+      background: var(--code);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .92rem
+    }
+
+    .fill dt {
+      font-weight: 600;
+      margin-top: 6px
+    }
+
+    .fill dd {
+      margin: 0 0 2px 0;
+      color: var(--muted)
+    }
+
+    .fill dd q {
+      color: var(--ink);
+      quotes: "“" "”"
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      background: var(--card)
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600
+    }
+
+    .pager {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line)
+    }
+
+    .roles {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0
+    }
+
+    .roles button[aria-pressed="true"] {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand)
+    }
+
+    .hide {
+      display: none !important
+    }
+
+    .scale {
+      display: flex;
+      gap: 4px;
+      margin: 10px 0
+    }
+
+    .scale button {
+      flex: 1;
+      padding: 12px 0;
+      font-weight: 700
+    }
+
+    .scale.s9 button.sel.r {
+      background: #fdd;
+      border-color: #c33;
+      color: #922
+    }
+
+    .scale.s9 button.sel.y {
+      background: #fff1b8;
+      border-color: #c9a100;
+      color: #6b5400
+    }
+
+    .scale.s9 button.sel.g {
+      background: #d8f5e3;
+      border-color: #1f9d5a;
+      color: #0d5b33
+    }
+
+    .scale.s5 button.sel {
+      background: var(--brand);
+      color: #fff
+    }
+
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 20, .88);
+      display: none;
+      place-items: center;
+      z-index: 50;
+      padding: 20px;
+      cursor: zoom-out
+    }
+
+    #lightbox.on {
+      display: grid
+    }
+
+    #lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      background: #fff
+    }
+
+    .kbd {
+      font-family: ui-monospace, Consolas, monospace;
+      background: var(--code);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: .88em
+    }
+
+    .matrix td.hl {
+      background: var(--theory-bg)
+    }
+
+    @media (max-width:900px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      nav.side {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+
+      nav.side ol {
+        display: flex;
+        gap: 6px;
+        overflow: auto;
+        padding-bottom: 6px
+      }
+
+      nav.side li a span.l {
+        white-space: nowrap
+      }
+    }
+
+    @media print {
+
+      nav.side,
+      .pager,
+      .tools {
+        display: none
+      }
+
+      .layout {
+        display: block
+      }
+
+      section.step {
+        display: block !important;
+        page-break-after: always
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="side" aria-label="Etapas do tutorial">
+      <h1>Mini-CEX na plataforma</h1>
+      <small>Tutorial interativo · Sinapse / ADAMED</small>
+      <div class="progress" aria-hidden="true"><b id="bar"></b></div>
+      <ol id="toc"></ol>
+      <div class="tools">
+        <button id="theme" type="button">Alternar tema</button>
+        <button id="reset" type="button">Reiniciar progresso</button>
+      </div>
+    </nav>
+
+    <main id="main">
+
+      <!-- ============ 0 ============ -->
+      <section class="step" data-title="Como usar este tutorial" id="s0">
+        <h2>Como usar este tutorial</h2>
+        <p class="lead">Um guia passo a passo do Mini-CEX, do Mini-CEX adaptado e dos períodos avaliativos na
+          plataforma, com telas reais capturadas por um teste automatizado (Playwright) que executou a funcionalidade de
+          ponta a ponta.</p>
+
+        <div class="grid">
+          <div class="card"><b>1. Teoria</b><br>O que o Caderno Mini-CEX APS (PUC Minas, v1.1) define: construto,
+            finalidade formativa, 8 domínios, escala e ciclo de feedback.</div>
+          <div class="card"><b>2. Mapa</b><br>Os 3 menus do Professor e os menus de Gestor, Preceptor e Aluno; relação
+            entre a teoria e a ferramenta.</div>
+          <div class="card"><b>3. Passo a passo</b><br>Um cenário completo com telas, preenchimentos de exemplo e a
+            utilização de cada perfil.</div>
+          <div class="card"><b>4. Referência</b><br>Escalas, regras de negócio, observações técnicas e como regenerar as
+            telas.</div>
+        </div>
+
+        <div class="callout">
+          <b class="t">Navegação</b>
+          Use o menu à esquerda, os botões <span class="kbd">Anterior</span>/<span class="kbd">Próxima</span> ou as
+          setas <span class="kbd">←</span> <span class="kbd">→</span> do teclado. Clique em qualquer imagem para
+          ampliá-la. O progresso fica salvo neste navegador.
+        </div>
+        <div class="callout warn">
+          <b class="t">Dados fictícios</b>
+          Todos os nomes (Profa. Helena Prado, Dr. Rafael Moura, Mariana Alves, Coordenação do Internato), turmas e
+          notas são inventados para esta documentação e foram gerados em um banco de desenvolvimento local. Nenhum dado
+          real de pessoas aparece nas telas.
+        </div>
+        <div class="callout theory">
+          <b class="t">Convenção de cores</b>
+          <span class="tag th">Teoria</span> trechos fundamentados no Caderno Mini-CEX APS v1.1 ·
+          <span class="tag">Plataforma</span> comportamento observado na ferramenta ·
+          <span class="tag ok">Exemplo</span> valores usados no preenchimento.
+        </div>
+        <h3>O cenário usado em todo o tutorial</h3>
+        <div class="tablewrap">
+          <table>
+            <tr>
+              <th>Elemento</th>
+              <th>Valor de exemplo</th>
+            </tr>
+            <tr>
+              <td>Curso / campus</td>
+              <td>Medicina (Tutorial Mini-CEX) · Campus Tutorial</td>
+            </tr>
+            <tr>
+              <td>Turma / disciplina</td>
+              <td>100 — Internato em Medicina de Família e Comunidade</td>
+            </tr>
+            <tr>
+              <td>Gestor</td>
+              <td>Coordenação do Internato</td>
+            </tr>
+            <tr>
+              <td>Professor(a)</td>
+              <td>Profa. Helena Prado</td>
+            </tr>
+            <tr>
+              <td>Preceptor</td>
+              <td>Dr. Rafael Moura (Preceptor)</td>
+            </tr>
+            <tr>
+              <td>Aluna</td>
+              <td>Mariana Alves</td>
+            </tr>
+            <tr>
+              <td>Períodos</td>
+              <td>“Internato APS — 1º ciclo (MiniCEX)” e “… (Adaptado)”, de 01/11/2026 a 18/12/2026</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 1 ============ -->
+      <section class="step" data-title="Fundamentos: o Mini-CEX" id="s1">
+        <h2>Fundamentos: o que é o Mini-CEX</h2>
+        <p class="lead">Base teórica extraída do <i>Caderno Mini-CEX APS — Caderno de Avaliação e Rubricas</i> (Ana
+          Carolina Ribeiro Assis Araújo, PUC Minas Betim, versão 1.1, pré-estudo de validade, 2026).</p>
+
+        <div class="callout theory">
+          <b class="t"><span class="tag th">Teoria</span> Construto</b>
+          O Mini-CEX APS foi desenvolvido para a <b>observação direta e avaliação formativa do desempenho clínico</b> de
+          estudantes de Medicina no ciclo dos internatos, durante <b>encontros clínicos reais</b> na Atenção Primária à
+          Saúde. O construto é o <i>desempenho clínico observado e contextualizado</i> do estudante em um encontro — não
+          a competência global.
+        </div>
+
+        <h3>Ideias centrais</h3>
+        <div class="grid">
+          <div class="card"><b>Finalidade formativa</b><br>Estruturar a observação direta, apoiar julgamentos baseados
+            em comportamentos observáveis e gerar feedback específico e oportuno.</div>
+          <div class="card"><b>Amostra, não veredito</b><br>Uma aplicação isolada é uma amostra contextualizada do
+            desempenho. Decisões de maior consequência não devem se basear em uma única observação.</div>
+          <div class="card"><b>Preceptor presente</b><br>O instrumento não pressupõe atuação independente: a
+            responsabilidade assistencial permanece com o profissional responsável.</div>
+          <div class="card"><b>Segurança do paciente</b><br>Dimensão transversal. Falhas relevantes de segurança, ética
+            ou profissionalismo não são compensadas por notas altas em outros domínios.</div>
+        </div>
+
+        <h3>Os 8 domínios do Caderno</h3>
+        <div class="tablewrap">
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Domínio</th>
+              <th>Pergunta predominante</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Comunicação clínica e condução do encontro</td>
+              <td>Como o estudante se comunica e conduz o encontro?</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Anamnese e obtenção de informações</td>
+              <td>Que informações relevantes foram obtidas, sem omissões nem coleta indiscriminada?</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Exame físico: seleção, execução e interpretação</td>
+              <td>O exame foi proporcional à hipótese e ao risco?</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Raciocínio clínico, avaliação de risco e manejo da incerteza</td>
+              <td>Raciocina em termos de probabilidade, risco e evolução no tempo?</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Conduta clínica, plano de cuidado e tomada de decisão</td>
+              <td>O que propõe fazer e quão adequado é ao problema, à pessoa e ao contexto?</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Profissionalismo, ética e responsabilidade</td>
+              <td>Comportamentos observáveis: respeito, integridade, limites, busca de orientação.</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Cuidado centrado na pessoa e decisão compartilhada</td>
+              <td>Como o que importa para esta pessoa modifica as decisões?</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Registro clínico, organização e uso de recursos</td>
+              <td>O registro e a organização sustentam continuidade e coordenação?</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Escala do Caderno (1 a 5 + N/O)</h3>
+        <div class="tablewrap">
+          <table>
+            <tr>
+              <th>Nível</th>
+              <th>Significado</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Muito abaixo do esperado — lacunas importantes, intervenção frequente, pode comprometer a segurança.
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Abaixo do esperado — parcialmente adequado, inconsistente, orientação relevante do preceptor.</td>
+            </tr>
+            <tr>
+              <td><b>3</b></td>
+              <td><b>Adequado ao nível de formação</b> — ponto de referência da escala, com a supervisão habitual do
+                internato.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Acima do esperado — consistente, organizado, pouca orientação.</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Excepcional para o nível de formação — reservado a desempenho claramente excepcional.</td>
+            </tr>
+            <tr>
+              <td>N/O</td>
+              <td>Não observado / não aplicável — sem oportunidade suficiente para julgar. <b>Não é desempenho
+                  inadequado</b> e não vira pontuação.</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Princípios de uso</h3>
+        <details open>
+          <summary>Não pontuar o que não foi observado (N/O)</summary>
+          <p>Nem todo encontro permite avaliar todos os domínios. Não se atribui nota com base em desempenho anterior,
+            impressão geral ou expectativa. O Caderno recomenda registrar N/O.</p>
+        </details>
+        <details>
+          <summary>Não dupla pontuação</summary>
+          <p>Um mesmo comportamento pode se relacionar a mais de um domínio, mas deve ser julgado na dimensão
+            predominante, sem pontuar várias vezes.</p>
+        </details>
+        <details>
+          <summary>Avaliação global ≠ média</summary>
+          <p>O julgamento global do encontro usa a mesma escala de 1 a 5, é integrador e <b>não</b> corresponde à média
+            aritmética dos domínios.</p>
+        </details>
+        <details>
+          <summary>Complexidade do encontro</summary>
+          <p>Duas perguntas separadas: quão complexa foi a situação clínica? Como o estudante desempenhou as atividades
+            diante dela? A complexidade contextualiza, mas não altera matematicamente a nota.</p>
+        </details>
+
+        <h3>O ciclo formativo</h3>
+        <div class="callout theory">
+          <b class="t"><span class="tag th">Teoria</span> OBSERVAR → JULGAR → FEEDBACK → PLANEJAR → OBSERVAR
+            NOVAMENTE</b>
+          Com a autoavaliação do estudante: <b>observação direta → autoavaliação → feedback → pontos fortes e aspectos a
+            desenvolver → PDAP → nova oportunidade</b>. A autoavaliação não pretende reproduzir as notas do preceptor. O
+          <b>PDAP</b> (Plano de Desenvolvimento e Aprendizagem Pessoal) transforma o feedback em objetivos específicos,
+          factíveis e, quando pertinente, <i>SMART</i>.
+        </div>
+      </section>
+
+      <!-- ============ 2 ============ -->
+      <section class="step" data-title="Mapa da plataforma" id="s2">
+        <h2>Mapa da plataforma: menus e perfis</h2>
+        <p class="lead">O Mini-CEX é oferecido em três frentes que se complementam: o <b>Mini-CEX</b> (formulário com 7
+          competências, escala 1–9), o <b>Mini-CEX adaptado</b> (critérios configuráveis, escala 1–5) e os <b>períodos
+            avaliativos</b> que organizam ambos.</p>
+
+        <h3>Os 3 menus do Professor (grupo “Avaliações Clínicas”)</h3>
+        <div class="grid">
+          <div class="card"><span class="tag">Menu
+              1</span><br><b>MINICEX</b><br><small>/professor/minicex</small><br>Banco de observações (aba
+            “Observações”), nova observação e “Resultados e análises”.</div>
+          <div class="card"><span class="tag">Menu 2</span><br><b>Períodos
+              avaliativos</b><br><small>/professor/minicex/periods</small><br>Cadastro dos períodos dos dois tipos,
+            nota, pesos e preceptores autorizados.</div>
+          <div class="card"><span class="tag">Menu 3</span><br><b>MINICEX
+              Adaptado</b><br><small>/professor/formative-assessment</small><br>Avaliação formativa com critérios do
+            gestor; observações e análises do adaptado.</div>
+        </div>
+        <figure><img loading="lazy" src="img/menu-professor.png"
+            alt="Menu lateral do professor expandido com os três menus de avaliações clínicas">
+          <figcaption><b>Menu lateral do Professor expandido</b> (<span class="kbd">Ctrl</span>+<span
+              class="kbd">B</span> ou o botão ☰): em “Avaliações Clínicas” ficam MINICEX, Períodos avaliativos e MINICEX
+            Adaptado.</figcaption>
+        </figure>
+
+        <h3>Quem usa o quê</h3>
+        <div class="roles" role="group" aria-label="Filtrar por perfil" id="roleFilter">
+          <button type="button" aria-pressed="true" data-r="all">Todos</button>
+          <button type="button" aria-pressed="false" data-r="Gestor">Gestor</button>
+          <button type="button" aria-pressed="false" data-r="Professor">Professor</button>
+          <button type="button" aria-pressed="false" data-r="Preceptor">Preceptor</button>
+          <button type="button" aria-pressed="false" data-r="Aluno">Aluno</button>
+        </div>
+        <div class="tablewrap">
+          <table id="roleTable">
+            <tr>
+              <th>Perfil</th>
+              <th>Menus</th>
+              <th>O que faz</th>
+            </tr>
+            <tr data-r="Gestor">
+              <td><b>Gestor</b> (Manager)</td>
+              <td>MINICEX → Autoavaliação, Critérios de avaliação<br>MINICEX Adaptado → Critérios MINICEX, Períodos
+                MINICEX</td>
+              <td>Define os descritores das notas, o questionário de autoavaliação do curso, os critérios do adaptado e
+                acompanha os períodos.</td>
+            </tr>
+            <tr data-r="Professor">
+              <td><b>Professor</b></td>
+              <td>MINICEX · Períodos avaliativos · MINICEX Adaptado</td>
+              <td>Cadastra períodos, autoriza preceptores da turma, registra observações e consulta análises.</td>
+            </tr>
+            <tr data-r="Preceptor">
+              <td><b>Preceptor</b></td>
+              <td>MINICEX Adaptado → Observações<br>MINICEX → Observações</td>
+              <td>Registra observações nas turmas em que foi autorizado e vê resultados.</td>
+            </tr>
+            <tr data-r="Aluno">
+              <td><b>Aluno</b> (Student)</td>
+              <td>MINICEX → Autoavaliações</td>
+              <td>Responde à autoavaliação de cada observação (prazo de 20 minutos) e acompanha a situação.</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Teoria ↔ plataforma</h3>
+        <p>Como cada ideia do Caderno aparece na ferramenta. <i>(Correspondência de leitura desta documentação, não uma
+            regra do sistema.)</i></p>
+        <div class="tablewrap">
+          <table class="matrix">
+            <tr>
+              <th>Caderno (teoria)</th>
+              <th>Onde aparece na plataforma</th>
+              <th>Observação</th>
+            </tr>
+            <tr>
+              <td>Observação direta em encontro real</td>
+              <td>Formulário “Nova observação” (Mini-CEX) e “Avaliação Formativa” (adaptado), com data da consulta,
+                tipo, complexidade e geolocalização</td>
+              <td>Cada observação é uma amostra datada e localizada.</td>
+            </tr>
+            <tr>
+              <td>Escala com ponto de referência</td>
+              <td>Mini-CEX: 1–9 (Insatisfatório 1–3, Satisfatório 4–6, Superior 7–9). Adaptado: 1–5 (Insatisfatório 1–2
+                … Superior)</td>
+              <td class="hl">O Caderno usa 1–5 com referência no nível 3; o adaptado é o que mais se aproxima dessa
+                escala.</td>
+            </tr>
+            <tr>
+              <td>N/O — Não observado</td>
+              <td>Botão “Não Observado” em cada competência/item: o item sai do cálculo</td>
+              <td>Alinhado ao Caderno.</td>
+            </tr>
+            <tr>
+              <td>Notas extremas exigem fundamentação</td>
+              <td>No adaptado, notas 1 ou 5 exigem justificativa obrigatória</td>
+              <td>Alinhado ao nível 5 “reservado a desempenho excepcional”.</td>
+            </tr>
+            <tr>
+              <td>Feedback e pontos fortes / a desenvolver</td>
+              <td>Adaptado: “Pontos fortes”, “Pontos a melhorar”, “Plano de melhoria”. Mini-CEX: caixa de comentários
+              </td>
+              <td>O “Plano de melhoria” corresponde ao espírito do PDAP.</td>
+            </tr>
+            <tr>
+              <td>Autoavaliação do estudante</td>
+              <td>QR code / página do aluno, questionário do gestor + nota 1–5 de desempenho</td>
+              <td>Não é comparada automaticamente com as notas do preceptor.</td>
+            </tr>
+            <tr>
+              <td>Múltiplas observações ao longo do tempo</td>
+              <td>Períodos avaliativos + telas de “Resultados e análises” (média, dispersão, perfil por critério)</td>
+              <td>Dá a visão longitudinal que o Caderno recomenda.</td>
+            </tr>
+            <tr>
+              <td>Oito domínios</td>
+              <td>Mini-CEX: 7 competências fixas. Adaptado: critérios e itens definidos pelo gestor</td>
+              <td class="hl">As competências do Mini-CEX clássico não são idênticas aos 8 domínios; o adaptado permite
+                configurá-los.</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 3 Gestor ============ -->
+      <section class="step" data-title="Etapa 1 · Gestor configura" id="s3">
+        <span class="tag">Perfil: Gestor</span>
+        <h2>Etapa 1 — O Gestor prepara a configuração</h2>
+        <p class="lead">Antes das primeiras observações, o gestor define os critérios do adaptado e o questionário de
+          autoavaliação do curso. Sem esse questionário, o professor não consegue gerar o QR code do aluno.</p>
+
+        <h3>1.1 Critérios de avaliação do Mini-CEX (descritores 1–9)</h3>
+        <figure class="tall"><img loading="lazy" src="img/gestor-01-criterios-minicex-normal.png"
+            alt="Tela de critérios de avaliação do MiniCEX com descritores das notas 1 a 9">
+          <figcaption><b>MINICEX → Critérios de avaliação.</b> O campus usa textos padrão (“Este campus usa os textos
+            padrão”). O gestor pode personalizar os descritores das notas 1 a 9; as faixas e os cálculos permanecem
+            iguais.</figcaption>
+        </figure>
+        <div class="callout theory"><span class="tag th">Teoria</span> As rubricas orientam o julgamento por
+          comportamentos observáveis em cada nível. Aqui os descritores textuais cumprem esse papel para o campus.</div>
+
+        <h3>1.2 Critérios do formulário adaptado</h3>
+        <ol class="how">
+          <li>Abra <b>MINICEX Adaptado → Critérios MINICEX</b>. A tela começa com um critério vazio.</li>
+          <li>Digite o nome do critério (ex.: “Comunicação e condução do encontro”), escolha o <i>Bloco</i> e descreva
+            cada item observável.</li>
+          <li>Use <b>Adicionar Item</b> e <b>Adicionar Novo Critério</b>; depois <b>Salvar Formulário</b>.</li>
+        </ol>
+        <figure><img loading="lazy" src="img/gestor-03-criterios-adaptado-vazio.png"
+            alt="Tela de critérios do adaptado vazia">
+          <figcaption><b>Ponto de partida:</b> estrutura vazia, pronta para receber critérios e itens.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/gestor-04-criterios-adaptado-preenchido.png"
+            alt="Critérios do adaptado preenchidos">
+          <figcaption><b>Preenchimento de exemplo.</b></figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Critério 1</dt>
+          <dd><q>Comunicação e condução do encontro</q> — itens: <q>Apresenta-se e estabelece vínculo com a pessoa</q>;
+            <q>Usa linguagem compreensível e escuta ativamente</q></dd>
+          <dt>Critério 2</dt>
+          <dd><q>Raciocínio clínico e plano de cuidado</q> — itens: <q>Formula hipóteses plausíveis e reconhece sinais
+              de alerta</q>; <q>Propõe conduta com seguimento e reavaliação</q></dd>
+        </dl>
+        <div class="callout theory"><span class="tag th">Teoria</span> Os exemplos foram inspirados nos domínios 1 e 4–5
+          do Caderno (comunicação; raciocínio e plano). Cada instituição define os seus critérios.</div>
+        <figure><img loading="lazy" src="img/gestor-04b-criterios-adaptado-salvo.png"
+            alt="Mensagem de sucesso ao salvar o formulário adaptado e descritores gerais de 1 a 5">
+          <figcaption><b>Salvo:</b> “Campos do formulário salvos com sucesso!”. Abaixo ficam os <b>descritores gerais
+              das notas de 1 a 5</b> (ex.: 1–2: Insatisfatório), aplicados a todos os itens do campus.</figcaption>
+        </figure>
+
+        <h3>1.3 Autoavaliação do curso</h3>
+        <ol class="how">
+          <li>Abra <b>MINICEX → Autoavaliação</b> e clique em <b>Cadastrar autoavaliação</b>.</li>
+          <li>Informe o nome e as perguntas (texto livre). A nota de desempenho de 1 a 5 é incluída automaticamente.
+          </li>
+          <li>Marque quais perguntas são obrigatórias e clique em <b>Salvar autoavaliação</b>.</li>
+        </ol>
+        <figure><img loading="lazy" src="img/gestor-02-autoavaliacao.png"
+            alt="Tela de autoavaliação do gestor sem questionário">
+          <figcaption><b>Antes:</b> “Nenhum questionário cadastrado.”</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/gestor-02b-autoavaliacao-preenchida.png"
+            alt="Questionário de autoavaliação preenchido">
+          <figcaption><b>Preenchimento de exemplo.</b></figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Nome</dt>
+          <dd><q>Autoavaliação do encontro clínico — APS</q></dd>
+          <dt>Pergunta 1</dt>
+          <dd><q>O que você considera que fez bem neste encontro clínico?</q></dd>
+          <dt>Pergunta 2</dt>
+          <dd><q>O que você faria de forma diferente numa próxima oportunidade?</q></dd>
+          <dt>Pergunta 3</dt>
+          <dd><q>Qual meta de aprendizagem (PDAP) você propõe para o próximo encontro?</q></dd>
+        </dl>
+        <div class="callout theory"><span class="tag th">Teoria</span> O Caderno sugere que a autoavaliação explore o
+          que foi bem, o que mudar e a meta de aprendizagem (PDAP), sem a intenção de reproduzir as notas do preceptor —
+          exatamente o foco das perguntas acima.</div>
+        <figure><img loading="lazy" src="img/gestor-02c-autoavaliacao-salva.png" alt="Questionário salvo">
+          <figcaption><b>Depois:</b> o questionário é “aplicado automaticamente aos períodos deste curso”.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 4 Periodos ============ -->
+      <section class="step" data-title="Etapa 2 · Períodos avaliativos" id="s4">
+        <span class="tag">Perfil: Professor</span> <span class="tag">Menu 2: Períodos avaliativos</span>
+        <h2>Etapa 2 — Períodos avaliativos</h2>
+        <p class="lead">O período é o “container” das observações: define turma, intervalo de datas, nota máxima e (no
+          Mini-CEX normal) o peso de cada competência. A data de cada observação precisa estar dentro do período.</p>
+
+        <figure><img loading="lazy" src="img/prof-01-periodos-lista-vazia.png" alt="Lista de períodos vazia">
+          <figcaption><b>Menu “Períodos avaliativos”:</b> a lista começa vazia; clique em <b>Novo período</b>.
+          </figcaption>
+        </figure>
+
+        <h3>2.1 Período do Mini-CEX normal</h3>
+        <figure class="tall"><img loading="lazy" src="img/prof-02-periodo-normal-form-vazio.png"
+            alt="Formulário de período normal vazio">
+          <figcaption><b>Formulário.</b> Escolha o <i>Tipo de avaliação</i> “MiniCEX normal” e a <i>Turma</i>. Os pesos
+            vêm pré-preenchidos (15/15/14/14/14/14/14) e devem somar <b>100%</b>.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/prof-03-periodo-normal-preenchido.png"
+            alt="Formulário de período preenchido">
+          <figcaption><b>Preenchido.</b></figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Nome</dt>
+          <dd><q>Internato APS — 1º ciclo (MiniCEX)</q></dd>
+          <dt>Data inicial / final</dt>
+          <dd>01/11/2026 a 18/12/2026</dd>
+          <dt>Nota</dt>
+          <dd>10 (máximo do período)</dd>
+          <dt>Pesos (%)</dt>
+          <dd>Entrevista 15 · Exame físico 15 · Humanismo 14 · Raciocínio 14 · Orientação 14 · Organização 14 ·
+            Competência geral 14 = 100</dd>
+        </dl>
+        <h4>Autorizar o preceptor da turma</h4>
+        <figure class="tall"><img loading="lazy" src="img/prof-04-preceptor-autorizado.png"
+            alt="Preceptor autorizado na turma">
+          <figcaption><b>Preceptores autorizados:</b> selecione “Dr. Rafael Moura” e clique em <b>Adicionar
+              preceptor</b>. A autorização é salva na hora e vale para <b>os dois tipos</b> de Mini-CEX da turma.
+          </figcaption>
+        </figure>
+        <div class="callout warn"><b class="t">Regras úteis</b>
+          Só o professor responsável pela turma gerencia preceptores. A soma dos pesos precisa ser exatamente 100%
+          (senão “Salvar período” fica desabilitado). A data final não pode ser anterior à inicial.</div>
+
+        <h3>2.2 Período do Mini-CEX adaptado</h3>
+        <figure class="tall"><img loading="lazy" src="img/prof-05-periodo-adaptado-preenchido.png"
+            alt="Formulário de período adaptado preenchido">
+          <figcaption><b>Tipo “MiniCEX adaptado”:</b> não há pesos por competência; a <b>Nota</b> informada (aqui 20) é
+            o valor da avaliação. Os critérios vêm do formulário do gestor.</figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Nome</dt>
+          <dd><q>Internato APS — 1º ciclo (Adaptado)</q></dd>
+          <dt>Datas / Nota</dt>
+          <dd>01/11/2026 a 18/12/2026 · 20</dd>
+        </dl>
+        <figure><img loading="lazy" src="img/prof-06-periodos-lista.png" alt="Lista com os dois períodos">
+          <figcaption><b>Resultado:</b> a lista mostra os dois tipos, com <b>Editar</b> e <b>Ver análise</b>. O filtro
+            “Tipo de avaliação” separa normal e adaptado.</figcaption>
+        </figure>
+        <div class="callout">
+          <b class="t"><span class="tag">Gestor</span> Visão de períodos do adaptado</b>
+          No perfil Gestor, <b>MINICEX Adaptado → Períodos MINICEX</b> lista os períodos do curso.
+        </div>
+        <figure><img loading="lazy" src="img/gestor-05-periodos-adaptado.png"
+            alt="Períodos do adaptado na visão do gestor">
+          <figcaption><b>Visão do Gestor</b> (capturada antes do cadastro do professor, por isso ainda sem registros).
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 5 Mini-CEX ============ -->
+      <section class="step" data-title="Etapa 3 · Observação Mini-CEX" id="s5">
+        <span class="tag">Perfil: Professor</span> <span class="tag">Menu 1: MINICEX</span>
+        <h2>Etapa 3 — Registrar uma observação Mini-CEX</h2>
+        <p class="lead">Durante ou logo após o encontro clínico, o avaliador preenche o formulário: identificação, dados
+          da consulta, notas das 7 competências, tempo, satisfação e comentário orientador.</p>
+
+        <figure><img loading="lazy" src="img/prof-07-minicex-observacoes-vazio.png" alt="Banco de observações vazio">
+          <figcaption><b>Menu “MINICEX”:</b> a aba “Observações” (filtros por aluno, data, período e turma) começa
+            vazia. Clique em <b>Nova observação</b>.</figcaption>
+        </figure>
+
+        <h3>3.1 Identificação</h3>
+        <figure><img loading="lazy" src="img/prof-08-minicex-identificacao.png" alt="Identificação preenchida">
+          <figcaption><b>Passo a passo:</b> 1.1 Turma → 1.2 Período avaliativo → 1.3 Aluno → 2.1 Data. A data é ajustada
+            ao período e não pode sair dele.</figcaption>
+        </figure>
+
+        <h3>3.2 Preenchimento completo</h3>
+        <figure class="tall"><img loading="lazy" src="img/prof-09-minicex-preenchido.png"
+            alt="Formulário Mini-CEX preenchido">
+          <figcaption><b>Formulário completo</b> (clique para ampliar). Em cada competência escolha <i>Observado</i> ou
+            <i>Não Observado</i> e uma nota de 1 a 9; o botão “Ver critérios” mostra os descritores.</figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Modalidade</dt>
+          <dd>Consulta (ou Diária, para observação do dia)</dd>
+          <dt>1.1 Queixa principal</dt>
+          <dd><q>Dor lombar há 2 semanas, sem sinais de alarme</q></dd>
+          <dt>1.2–1.7</dt>
+          <dd>Local: Ambulatório · Idade: 54 · Sexo: Feminino · Tipo: Primeira consulta · Complexidade: Baixa · Foco:
+            Coleta de dados</dd>
+          <dt>Notas (1–9)</dt>
+          <dd>Entrevista 6 · Exame físico 5 · Humanismo 8 · Raciocínio 5 · Orientação 6 · Organização 7 · Competência
+            geral 6</dd>
+          <dt>8. Tempo</dt>
+          <dd>Consulta 00:25 · Devolutiva 00:10</dd>
+          <dt>9. Satisfação</dt>
+          <dd>Tutor clínico 8 · Estudante 7</dd>
+          <dt>Comentário</dt>
+          <dd><q>Boa condução e vínculo com o paciente. Precisa explorar melhor sinais de alerta na lombalgia e
+              organizar o retorno.</q></dd>
+        </dl>
+        <h4>Experimente a escala 1–9</h4>
+        <p>Cores usadas pelo formulário: 1–3 vermelho (<b>Insatisfatório</b>), 4–6 amarelo (<b>Satisfatório</b>), 7–9
+          verde (<b>Superior</b>).</p>
+        <div class="scale s9" id="sc9" role="group" aria-label="Escala de 1 a 9"></div>
+        <p id="sc9txt" class="lead">Clique em uma nota.</p>
+        <div class="callout theory"><span class="tag th">Teoria</span> O comentário final deve orientar o estudante com
+          <b>feedback específico</b> (o que manter e o que desenvolver). No exemplo: ponto forte (vínculo) + ponto de
+          desenvolvimento (sinais de alerta) + encaminhamento (retorno) — o ciclo observar → feedback → planejar.</div>
+        <div class="callout warn"><b class="t">Localização</b> O formulário captura a geolocalização automaticamente e
+          exige “Localização confirmada” para enviar. O navegador precisa permitir a localização.</div>
+
+        <h3>3.3 Fim de consulta e QR code da autoavaliação</h3>
+        <figure><img loading="lazy" src="img/prof-10-minicex-fim-consulta-qr.png" alt="Diálogo Fim de consulta">
+          <figcaption><b>“Avaliação enviada com sucesso!”</b> O sistema pergunta se deve gerar o QR code. Ao gerar,
+            começam os <b>20 minutos</b> para o aluno responder; gerar de novo não renova o prazo. É possível “Pular
+            esta etapa”.</figcaption>
+        </figure>
+        <figure><img loading="lazy" src="img/prof-11-minicex-qr-autoavaliacao.png" alt="QR code da autoavaliação">
+          <figcaption><b>QR code</b> exclusivo desta observação, com <b>Copiar link</b>: o aluno pode responder sem
+            login.</figcaption>
+        </figure>
+
+        <h3>3.4 Banco de observações</h3>
+        <figure><img loading="lazy" src="img/prof-12-minicex-observacoes-lista.png" alt="Lista de observações">
+          <figcaption><b>Observação salva</b> na lista do professor (aluno, preceptor, período, modalidade, data e
+            última alteração).</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 6 Adaptado ============ -->
+      <section class="step" data-title="Etapa 4 · Mini-CEX adaptado" id="s6">
+        <span class="tag">Perfil: Professor</span> <span class="tag">Menu 3: MINICEX Adaptado</span>
+        <h2>Etapa 4 — Avaliação formativa (Mini-CEX adaptado)</h2>
+        <p class="lead">O adaptado usa os critérios e itens definidos pelo gestor, escala de 1 a 5 e três campos de
+          devolutiva. É a variação mais próxima da escala do Caderno.</p>
+
+        <figure><img loading="lazy" src="img/prof-14-adaptado-lista-vazia.png" alt="Lista do adaptado vazia">
+          <figcaption><b>Menu “MINICEX Adaptado”:</b> abas “Observações” e “Resultados e análises”; botão <b>Nova
+              consulta</b>.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/prof-15-adaptado-identificacao.png"
+            alt="Formulário do adaptado com critérios do gestor">
+          <figcaption><b>Turma → Período avaliativo → Aluno.</b> Ao escolher o aluno, os critérios do gestor aparecem.
+            Sem período do tipo adaptado cadastrado, a tela orienta a criá-lo em “Períodos avaliativos”.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/prof-16-adaptado-preenchido.png"
+            alt="Formulário adaptado preenchido">
+          <figcaption><b>Preenchimento de exemplo.</b></figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Notas (1–5)</dt>
+          <dd>1.1 Vínculo: 4 · 1.2 Linguagem e escuta: 3 · 2.1 Hipóteses e sinais de alerta: 2 · 2.2 Conduta e
+            reavaliação: 4</dd>
+          <dt>Pontos fortes</dt>
+          <dd><q>Estabelece vínculo com facilidade e usa linguagem acessível. Boa escuta ativa.</q></dd>
+          <dt>Pontos a melhorar</dt>
+          <dd><q>Não explorou sinais de alerta da lombalgia; plano sem critérios claros de retorno.</q></dd>
+          <dt>Plano de melhoria</dt>
+          <dd><q>Revisar bandeiras vermelhas da lombalgia e propor, no próximo encontro, retorno com prazo definido.</q>
+          </dd>
+        </dl>
+        <h4>Experimente a escala 1–5</h4>
+        <div class="scale s5" id="sc5" role="group" aria-label="Escala de 1 a 5"></div>
+        <p id="sc5txt" class="lead">Clique em uma nota.</p>
+        <div class="callout theory"><span class="tag th">Teoria</span> A tríade <b>pontos fortes / pontos a melhorar /
+            plano de melhoria</b> traduz o ciclo do Caderno (“pontos fortes e aspectos a desenvolver → PDAP”). Um bom
+          plano é específico, factível e com prazo, como no exemplo.</div>
+        <figure><img loading="lazy" src="img/prof-17-adaptado-fim-consulta.png" alt="Fim de consulta no adaptado">
+          <figcaption><b>Envio:</b> o mesmo diálogo de “Fim de consulta” oferece o QR code da autoavaliação.
+          </figcaption>
+        </figure>
+        <figure><img loading="lazy" src="img/prof-18-adaptado-lista.png" alt="Lista do adaptado com a avaliação">
+          <figcaption><b>Resultado</b> na lista do adaptado.</figcaption>
+        </figure>
+
+        <h3>Notas 1 e 5 exigem justificativa</h3>
+        <figure class="tall"><img loading="lazy" src="img/prec-04a-adaptado-justificativa-obrigatoria.png"
+            alt="Justificativa obrigatória para nota 5">
+          <figcaption>Ao marcar <b>5</b> (ou 1), surge “Justificativa obrigatória”: <i>“Descreva no que o aluno se
+              destacou…”</i>. Sem ela o envio é bloqueado com a mensagem “Justificativa obrigatória para notas 1 ou 5”.
+          </figcaption>
+        </figure>
+        <div class="callout theory"><span class="tag th">Teoria</span> O nível 5 é “reservado para desempenhos
+          claramente excepcionais”; exigir justificativa evita notas extremas sem comportamento observável que as
+          sustente.</div>
+      </section>
+
+      <!-- ============ 7 Preceptor ============ -->
+      <section class="step" data-title="Etapa 5 · Preceptor" id="s7">
+        <span class="tag">Perfil: Preceptor</span>
+        <h2>Etapa 5 — O Preceptor observa e avalia</h2>
+        <p class="lead">O preceptor acompanha o aluno no serviço. Depois de autorizado pelo professor, enxerga apenas as
+          turmas em que atua e registra observações nos dois tipos.</p>
+        <figure><img loading="lazy" src="img/menu-preceptor.png" alt="Menu do preceptor">
+          <figcaption><b>Menu do Preceptor:</b> “MINICEX Adaptado → Observações” e “MINICEX → Observações”.</figcaption>
+        </figure>
+        <figure><img loading="lazy" src="img/prec-01-minicex-observacoes.png" alt="Observações do preceptor">
+          <figcaption><b>Mini-CEX → Observações:</b> mesma tela de banco de observações, com <b>Nova observação</b>.
+          </figcaption>
+        </figure>
+
+        <h3>5.1 Mini-CEX com item “Não Observado”</h3>
+        <figure class="tall"><img loading="lazy" src="img/prec-02-minicex-preenchido-nao-observado.png"
+            alt="Mini-CEX com exame físico não observado">
+          <figcaption>Neste exemplo o <b>Exame físico</b> foi marcado como <b>Não Observado</b>: o item exibe “Este item
+            não foi observado na consulta” e não entra na nota.</figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Queixa</dt>
+          <dd><q>Hipertensão em acompanhamento, queixa de cefaleia</q> · 61 anos</dd>
+          <dt>Notas (1–9)</dt>
+          <dd>Entrevista 7 · Exame físico <b>N/O</b> · Humanismo 7 · Raciocínio 6 · Orientação 7 · Organização 6 ·
+            Competência geral 7 · Satisfação 8 e 8</dd>
+          <dt>Tempo</dt>
+          <dd>00:20 / 00:08</dd>
+          <dt>Comentário</dt>
+          <dd><q>Raciocínio organizado e boa orientação sobre adesão ao tratamento. Registrar melhor o plano de
+              seguimento.</q></dd>
+        </dl>
+        <div class="callout theory"><span class="tag th">Teoria</span> É o princípio do <b>N/O</b>: se não houve
+          oportunidade de observar o exame físico, não se pontua. Isso <b>não</b> significa desempenho inadequado.</div>
+
+        <h3>5.2 Mini-CEX adaptado</h3>
+        <figure><img loading="lazy" src="img/prec-03-adaptado-observacoes.png" alt="Observações adaptado do preceptor">
+          <figcaption><b>Mini-CEX Adaptado → Observações.</b></figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/prec-04-adaptado-preenchido.png"
+            alt="Avaliação adaptada do preceptor preenchida">
+          <figcaption><b>Preenchida:</b> notas 5, 4, 4 e 3, com a justificativa exigida para o 5.</figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>Justificativa (nota 5)</dt>
+          <dd><q>Conduziu a abertura do encontro com vínculo e acolhimento acima do esperado para o ciclo.</q></dd>
+          <dt>Pontos fortes</dt>
+          <dd><q>Conduziu o encontro de forma organizada e demonstrou raciocínio clínico consistente.</q></dd>
+          <dt>Pontos a melhorar</dt>
+          <dd><q>Pode registrar com mais clareza o plano de seguimento no prontuário.</q></dd>
+          <dt>Plano de melhoria</dt>
+          <dd><q>No próximo encontro, definir e registrar explicitamente critérios de retorno e metas com a pessoa.</q>
+          </dd>
+        </dl>
+        <div class="callout theory"><span class="tag th">Teoria</span> O comentário sobre <b>registro</b> dialoga com o
+          domínio 8 do Caderno (registro clínico, organização e continuidade).</div>
+      </section>
+
+      <!-- ============ 8 Aluno ============ -->
+      <section class="step" data-title="Etapa 6 · Aluno e autoavaliação" id="s8">
+        <span class="tag">Perfil: Aluno</span>
+        <h2>Etapa 6 — O Aluno responde à autoavaliação</h2>
+        <p class="lead">Cada observação gera uma autoavaliação para o aluno, que tem 20 minutos a partir do QR code ou
+          do início pela própria página (vale o que ocorrer primeiro).</p>
+        <figure><img loading="lazy" src="img/aluno-01-autoavaliacoes-lista.png" alt="Lista de autoavaliações do aluno">
+          <figcaption><b>MINICEX → Autoavaliações.</b> Cada linha traz observação, modalidade, período e <b>Situação</b>
+            (Pendente, Em andamento, Enviada), com <b>Iniciar</b> ou <b>Continuar</b>.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/aluno-02-autoavaliacao-inicio.png"
+            alt="Início da autoavaliação com contador">
+          <figcaption><b>Autoavaliação iniciada:</b> o questionário do gestor aparece como rascunho, com <b>Tempo
+              restante</b> (cronômetro de 20 min) e a nota de desempenho de 1 a 5.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/aluno-03-autoavaliacao-preenchida.png"
+            alt="Autoavaliação preenchida">
+          <figcaption><b>Preenchimento de exemplo.</b></figcaption>
+        </figure>
+        <dl class="fill">
+          <dt>1</dt>
+          <dd><q>Escutei a queixa sem interromper e expliquei o plano com linguagem simples.</q></dd>
+          <dt>2</dt>
+          <dd><q>Perguntaria mais sobre sinais de alerta da dor lombar antes de orientar o retorno.</q></dd>
+          <dt>3 (PDAP)</dt>
+          <dd><q>Revisar as bandeiras vermelhas da lombalgia e propor retorno com prazo, até o próximo encontro.</q>
+          </dd>
+          <dt>4 Desempenho</dt>
+          <dd>4 / 5</dd>
+        </dl>
+        <div class="callout theory"><span class="tag th">Teoria</span> A resposta 3 é um <b>PDAP</b> em miniatura:
+          específico (bandeiras vermelhas da lombalgia), factível e com prazo (até o próximo encontro) — os critérios do
+          princípio SMART citados no Caderno.</div>
+        <p>Botões: <b>Salvar rascunho</b> (guarda sem enviar) e <b>Enviar autoavaliação</b> (pede confirmação).</p>
+        <figure><img loading="lazy" src="img/aluno-04-confirmar-envio.png" alt="Confirmação do envio">
+          <figcaption><b>Confirmação:</b> depois de enviada, a resposta não pode mais ser editada.</figcaption>
+        </figure>
+        <figure class="tall"><img loading="lazy" src="img/aluno-05-autoavaliacao-enviada.png"
+            alt="Autoavaliação enviada">
+          <figcaption><b>Enviada:</b> o conteúdo fica somente leitura, com “Autoavaliação enviada.”</figcaption>
+        </figure>
+        <figure><img loading="lazy" src="img/aluno-06-lista-apos-envio.png" alt="Lista após envio">
+          <figcaption><b>Lista atualizada:</b> a situação muda para “Enviada”.</figcaption>
+        </figure>
+
+        <h3>E o Gestor vê as respostas</h3>
+        <figure><img loading="lazy" src="img/gestor-06-respostas-autoavaliacao.png"
+            alt="Respostas das autoavaliações vistas pelo gestor">
+          <figcaption>No <b>Gestor → Autoavaliação</b>, ao escolher o período, aparecem as “Respostas dos alunos”
+            (aluno, questionário, data e situação), com acesso à resposta.</figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 9 Análises ============ -->
+      <section class="step" data-title="Etapa 7 · Resultados e análises" id="s9">
+        <span class="tag">Perfil: Professor</span> <span class="tag">Aba “Resultados e análises”</span>
+        <h2>Etapa 7 — Resultados e análises</h2>
+        <p class="lead">Várias observações viram uma leitura longitudinal: é o uso que o Caderno recomenda (“múltiplas
+          observações … padrões de desempenho e desenvolvimento ao longo do tempo”).</p>
+        <figure><img loading="lazy" src="img/prof-13-minicex-resultados-analises.png"
+            alt="Aba de resultados e análises">
+          <figcaption><b>Passo 1:</b> aba “Resultados e análises” → escolha <b>Turma</b> e <b>Período avaliativo</b> →
+            <b>Ver análise detalhada</b>.</figcaption>
+        </figure>
+        <h3>Mini-CEX normal</h3>
+        <figure class="tall"><img loading="lazy" src="img/prof-19-analise-periodo-normal.png"
+            alt="Análise do período do Mini-CEX normal">
+          <figcaption><b>Análise do período:</b> resumo da turma (alunos com nota, observações), média geral, mínima,
+            máxima e desvio padrão, distribuição e dispersão das notas, média por aluno, <b>média por critério</b>,
+            <b>perfil dos critérios (radar)</b>, horário dos registros e lista de alunos com “Ver aluno”.</figcaption>
+        </figure>
+        <div class="callout">
+          <b class="t">Como ler o exemplo</b>
+          A média 7,01/10 (3 observações da aluna, com notas por competência entre 5 e 8) mostra Humanismo como ponto
+          mais forte e Exame físico/Raciocínio como mais baixos — coerente com o feedback textual dado.
+        </div>
+        <h3>Mini-CEX adaptado</h3>
+        <figure class="tall"><img loading="lazy" src="img/prof-20-analise-periodo-adaptado.png"
+            alt="Análise do período adaptado">
+          <figcaption><b>Mesma estrutura</b>, agora sobre os critérios do gestor e a nota de 20 pontos. Acesse também
+            por “Ver análise” na lista de períodos.</figcaption>
+        </figure>
+        <div class="callout theory"><span class="tag th">Teoria</span> O Caderno alerta que decisões de maior
+          consequência não devem se basear em uma observação isolada nem apenas no Mini-CEX. Use estas análises com
+          múltiplos encontros e outras fontes de informação.</div>
+      </section>
+
+
+
+      <div class="pager">
+        <button id="prev" type="button">← Anterior</button>
+        <button id="next" type="button" class="primary">Próxima →</button>
+      </div>
+    </main>
+  </div>
+
+  <div id="lightbox" role="dialog" aria-label="Imagem ampliada"><img alt=""></div>
+
+  <script>
+    (function () {
+      var steps = [].slice.call(document.querySelectorAll("section.step"));
+      var toc = document.getElementById("toc"), bar = document.getElementById("bar");
+      var KEY = "minicex-tutorial", state = { cur: 0, done: {} };
+      try { var s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) state = s; } catch (e) { }
+      function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { } }
+      steps.forEach(function (sec, i) {
+        var li = document.createElement("li"), a = document.createElement("a");
+        a.href = "#" + sec.id; a.dataset.i = i;
+        a.innerHTML = '<span class="n"><span>' + i + '</span></span><span class="l">' + sec.dataset.title + '</span>';
+        a.addEventListener("click", function (e) { e.preventDefault(); go(i); });
+        li.appendChild(a); toc.appendChild(li);
+      });
+      function go(i) {
+        i = Math.max(0, Math.min(steps.length - 1, i));
+        state.done[state.cur] = true; state.cur = i;
+        steps.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+        [].forEach.call(toc.querySelectorAll("a"), function (a, k) {
+          a.classList.toggle("active", k === i);
+          a.classList.toggle("done", !!state.done[k] && k !== i);
+        });
+        var count = Object.keys(state.done).length;
+        bar.style.width = Math.round(Math.min(count, steps.length) / steps.length * 100) + "%";
+        document.getElementById("prev").disabled = i === 0;
+        document.getElementById("next").textContent = i === steps.length - 1 ? "Voltar ao início" : "Próxima →";
+        history.replaceState(null, "", "#" + steps[i].id);
+        window.scrollTo({ top: 0 });
+        save();
+      }
+      document.getElementById("prev").onclick = function () { go(state.cur - 1); };
+      document.getElementById("next").onclick = function () { go(state.cur === steps.length - 1 ? 0 : state.cur + 1); };
+      document.addEventListener("keydown", function (e) {
+        if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName)) return;
+        if (e.key === "ArrowRight") go(state.cur + 1);
+        if (e.key === "ArrowLeft") go(state.cur - 1);
+        if (e.key === "Escape") lb.classList.remove("on");
+      });
+      document.getElementById("reset").onclick = function () { state = { cur: 0, done: {} }; save(); go(0); };
+      var h = location.hash.replace("#", ""), start = steps.findIndex(function (s) { return s.id === h; });
+      go(start >= 0 ? start : (state.cur || 0));
+
+      // tema
+      var root = document.documentElement;
+      try { var t = localStorage.getItem("minicex-theme"); if (t) root.dataset.theme = t; } catch (e) { }
+      document.getElementById("theme").onclick = function () {
+        var dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        root.dataset.theme = dark ? "light" : "dark";
+        try { localStorage.setItem("minicex-theme", root.dataset.theme); } catch (e) { }
+      };
+
+      // lightbox
+      var lb = document.getElementById("lightbox"), lbi = lb.querySelector("img");
+      document.addEventListener("click", function (e) {
+        var im = e.target.closest && e.target.closest("figure img");
+        if (im) { lbi.src = im.src; lbi.alt = im.alt; lb.classList.add("on"); }
+        else if (e.target.closest && e.target.closest("#lightbox")) { lb.classList.remove("on"); }
+      });
+
+      // filtro de perfis
+      var rf = document.getElementById("roleFilter");
+      if (rf) rf.addEventListener("click", function (e) {
+        var b = e.target.closest("button"); if (!b) return;
+        [].forEach.call(rf.querySelectorAll("button"), function (x) { x.setAttribute("aria-pressed", x === b); });
+        [].forEach.call(document.querySelectorAll("#roleTable tr[data-r]"), function (tr) {
+          tr.classList.toggle("hide", b.dataset.r !== "all" && tr.dataset.r !== b.dataset.r);
+        });
+      });
+
+      // escalas interativas
+      function scale(id, txtId, n, label) {
+        var box = document.getElementById(id), txt = document.getElementById(txtId);
+        for (var i = 1; i <= n; i++) {
+          (function (v) {
+            var b = document.createElement("button"); b.type = "button"; b.textContent = v;
+            b.addEventListener("click", function () {
+              [].forEach.call(box.children, function (c) { c.className = ""; });
+              var cls = label(v)[1]; b.className = "sel " + cls; txt.textContent = label(v)[0];
+            });
+            box.appendChild(b);
+          })(i);
+        }
+      }
+      scale("sc9", "sc9txt", 9, function (v) {
+        if (v <= 3) return [v + " — Insatisfatório (vermelho): desempenho abaixo do esperado; priorize feedback e nova oportunidade.", "r"];
+        if (v <= 6) return [v + " — Satisfatório (amarelo): desempenho adequado a regular; aponte o que consolidar.", "y"];
+        return [v + " — Superior (verde): desempenho acima do esperado para o ciclo.", "g"];
+      });
+      scale("sc5", "sc5txt", 5, function (v) {
+        var m = { 1: "1 — Muito abaixo do esperado (exige justificativa na plataforma).", 2: "2 — Abaixo do esperado.", 3: "3 — Adequado ao nível de formação: ponto de referência do Caderno.", 4: "4 — Acima do esperado.", 5: "5 — Excepcional para o nível de formação (exige justificativa na plataforma)." };
+        return [m[v], "s"];
+      });
+    })();
+  </script>
+</body>
+
+</html>
